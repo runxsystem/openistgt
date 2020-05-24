@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# PROVIDE: openistgt
+# REQUIRE: NETWORKING
+# BEFORE: mountcritremote
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name="openistgt"
+rcvar=`set_rcvar`
+extra_commands="reload"
+reload_cmd="istgt_reload"
+
+load_rc_config $name
+
+: ${openistgt_enable="NO"}
+: ${openistgt_config="%%CONFIGDIR%%/istgt.conf"}
+: ${openistgt_pidfile="/var/run/istgt.pid"}
+: ${openistgt_flags=""}
+
+#
+# Refresh configuration
+#
+openistgt_reload()
+{
+	%%BINDIR%%/istgtcontrol refresh
+}
+
+required_files="${openistgt_config}"
+pidfile="${openistgt_pidfile}"
+command="%%BINDIR%%/istgt"
+command_args="-c ${openistgt_config} ${openistgt_flags}"
+
+run_rc_command "$1"
